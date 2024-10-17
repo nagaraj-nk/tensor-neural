@@ -10,7 +10,7 @@ from joblib import dump, load
 # Parameters
 img_height = 28
 img_width = 28
-model_path = "flowers_classification_model.pkl"
+model_path = "model\\flowers_classification_model.pkl"
 
 # Function to load dataset
 def load_data(data_dir):

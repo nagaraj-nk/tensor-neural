@@ -11,7 +11,7 @@ import sys
 img_height = 28
 img_width = 28
 batch_size = 32
-model_path = "flowers_classification_model.pth"
+model_path = "model\\flowers_classification_model.pth"
 
 # Transformations for the images
 transform = transforms.Compose([
