@@ -8,7 +8,7 @@ import sys
 img_height = 28
 img_width = 28
 batch_size = 32
-model_path = "my_image_classification_model.keras"
+model_path = "flowers_classification_model.keras"
 
 # Function to load dataset
 def load_data(data_dir):
