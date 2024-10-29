@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image_dataset_from_directory
-from tensorflow.keras import layers, models
+from tensorflow.keras import layers, models, callbacks
 import os
 import sys
 
@@ -33,25 +33,33 @@ def load_data(data_dir):
     )
 
     return train_dataset, validation_dataset
-
-# Model building function
 def build_model(input_shape, num_classes):
     model = models.Sequential([
         layers.Rescaling(1./255, input_shape=input_shape),
-        layers.Conv2D(32, (3, 3), activation='relu'),
+        
+        # First convolutional block
+        layers.Conv2D(32, (3, 3), activation='relu', strides=1),
         layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
+        
+        # Second convolutional block
+        layers.Conv2D(64, (3, 3), activation='relu', strides=1),
         layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
+        
+        # Third convolutional block
+        layers.Conv2D(128, (3, 3), activation='relu', strides=1),
+        layers.MaxPooling2D((2, 2)),
+        
+        # Flatten and Dense layers
         layers.Flatten(),
-        layers.Dense(64, activation='relu'),
-        layers.Dense(num_classes, activation='softmax')  # Dynamic number of classes
+        layers.Dense(128, activation='relu'),
+        layers.Dropout(0.5),  # Dropout for regularization
+        layers.Dense(num_classes, activation='softmax')
     ])
 
-    model.compile(optimizer='adam',
+    model.compile(optimizer='sgd',
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
-
+    
     return model
 
 # Save and load model
@@ -84,7 +92,21 @@ def main(data_dir):
         model = build_model(input_shape, num_classes)
 
         # Train the model
-        model.fit(train_dataset, validation_data=validation_dataset, epochs=5)
+                
+        # Define early stopping callback
+        early_stopping = callbacks.EarlyStopping(
+            monitor='val_loss',   # Monitor validation loss
+            patience=3,           # Stop if val_loss doesn't improve for 3 consecutive epochs
+            restore_best_weights=True  # Restore the model weights from the epoch with the best val_loss
+        )
+
+        # Train the model with early stopping
+        history = model.fit(
+            train_dataset,
+            validation_data=validation_dataset,
+            epochs=100,            # Set a high maximum number of epochs
+            callbacks=[early_stopping]  # Pass the callback here
+        )
 
         # Save the model locally
         save_model(model)
