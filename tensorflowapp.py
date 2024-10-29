@@ -10,6 +10,8 @@ img_width = 28
 batch_size = 32
 model_path = "model\\flowers_classification_model.keras"
 
+os.makedirs(os.path.dirname(model_path), exist_ok=True)
+
 # Function to load dataset
 def load_data(data_dir):
     train_dataset = image_dataset_from_directory(

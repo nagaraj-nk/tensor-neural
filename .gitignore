@@ -57,3 +57,5 @@ newshapes2/
 *.keras
 *.pth
 *.pkl
+
+model/
